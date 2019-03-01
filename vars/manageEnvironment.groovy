@@ -2,21 +2,33 @@
 
 def call( String status ) {
 
-sh '''#!/bin/bash
-trap \'exit ${RESULT:-1}\' EXIT SIGHUP SIGINT SIGTERM
-${AUTOMATION_BASE_DIR}/setContext.sh
-RESULT=$?
-''' 
+    def contextProperties = readProperties interpolate: true, file: 'context.properties'
 
-sh '''#!/bin/bash
-trap \'exit ${RESULT:-1}\' EXIT SIGHUP SIGINT SIGTERM
-${AUTOMATION_DIR}/constructTree.sh
-RESULT=$?
-''' 
+    withEnv( contextProperties ) {
+        sh '''#!/bin/bash
+        trap \'exit ${RESULT:-1}\' EXIT SIGHUP SIGINT SIGTERM
+        ${AUTOMATION_BASE_DIR}/setContext.sh
+        RESULT=$?
+        ''' 
+    }
 
-sh '''#!/bin/bash
-trap \'exit ${RESULT:-1}\' EXIT SIGHUP SIGINT SIGTERM
-${AUTOMATION_DIR}/manageEnvironment.sh
-RESULT=$?
-'''
+    contextProperties = readProperties interpolate: true, file: 'context.properties'
+
+    withEnv( contextProperties ) {
+        sh '''#!/bin/bash
+        trap \'exit ${RESULT:-1}\' EXIT SIGHUP SIGINT SIGTERM
+        ${AUTOMATION_DIR}/constructTree.sh
+        RESULT=$?
+        ''' 
+    }
+
+    contextProperties = readProperties interpolate: true, file: 'context.properties'
+
+    withEnv( contextProperties ) {
+        sh '''#!/bin/bash
+        trap \'exit ${RESULT:-1}\' EXIT SIGHUP SIGINT SIGTERM
+        ${AUTOMATION_DIR}/manageEnvironment.sh
+        RESULT=$?
+        '''
+    }
 }
