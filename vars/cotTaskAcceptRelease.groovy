@@ -2,7 +2,7 @@
 
 def call( String propertiesFile ) {
 
-    skipDefaultCheckout()
+    skipDefaultCheckout(true)
     
     def environmentVariables = []
     def siteProperties = readProperties interpolate: true, file: cot.siteProperties();

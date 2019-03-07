@@ -2,6 +2,8 @@
 
 def call( ) {
 
+    skipDefaultCheckout(true)
+    
     def environmentVariables = []
     def siteProperties = readProperties interpolate: true, file: cot.siteProperties();
     environmentVariables += siteProperties.collect {/$it.key=$it.value/ }
