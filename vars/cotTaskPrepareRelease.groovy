@@ -6,10 +6,12 @@ def call( String propertiesFile ) {
     def productProperties = readProperties interpolate: true, file: propertiesFile;
     environmentVariables += productProperties.collect {/$it.key=$it.value/ }
 
-    withEnv ( environmentVariables + [ 'GIT_COMMIT=' ] ) {
+    // Override builtin variables
+    environmentVariables += [ 'GIT_COMMIT=' ]
+
+    withEnv ( environmentVariables ) {
         sh '''#!/bin/bash
             trap 'exit ${RESULT:-1}' EXIT SIGHUP SIGINT SIGTERM
-            echo "Silly Git Commit - ${GIT_COMMIT}"
             ${AUTOMATION_BASE_DIR}/setContext.sh -r selective
             RESULT=$?
         '''
