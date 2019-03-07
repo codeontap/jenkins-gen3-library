@@ -12,7 +12,7 @@ def call( String propertiesFile, String[]applicationDeploymentUnits ) {
                     "stopstart" will first stop the running deployment before starting the desired deployment.
                     "stop" will stop the running deployment but not start the desired deployment - mainly intended to facilitate database maintenance without the application.
                 ''' ),
-            string( name: 'RELEASE_IDENTIFIER' defaultValue: '', description: 'Identifier for the release to be deployed. \n The release identifier is allocated during release preparation.' )
+            string( name: 'RELEASE_IDENTIFIER', defaultValue: '', description: 'Identifier for the release to be deployed. \n The release identifier is allocated during release preparation.' )
         ]
 
     env.DEPLOYMENT_UNITS = basicParameters["DEPLOYMENT_UNITS"]
