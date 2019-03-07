@@ -2,8 +2,7 @@
 
 def call( String propertiesFile ) {
 
-    def environmentVariables = [ ]
-
+    def environmentVariables = []
     def productProperties = readProperties interpolate: true, file: propertiesFile;
     environmentVariables += productProperties.collect {/$it.key=$it.value/ }
 
@@ -17,9 +16,6 @@ def call( String propertiesFile ) {
     environmentVariables += contextProperties.collect {/$it.key=$it.value/ }
 
     withEnv( environmentVariables ) {
-
-        sh 'env'
-        
         sh '''#!/bin/bash
         trap \'exit ${RESULT:-1}\' EXIT SIGHUP SIGINT SIGTERM
         ${AUTOMATION_DIR}/constructTree.sh
