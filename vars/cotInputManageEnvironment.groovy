@@ -35,48 +35,54 @@ def call( String propertiesFile ) {
     env.LEVELS_LIST = levels.join(",")
     
     // Segment units
-    def segmentUnitParameters = []
-    productProperties["SEGMENT_UNITS"].split(",").each {
-        segmentUnitParameters += cotInput.createBooleanParameter('', it)
-    }
-    def segmentUnitInputs = input(
+    if env.LEVELS_LIST.contains('segment') {  
+        def segmentUnitParameters = []
+        productProperties["SEGMENT_UNITS"].split(",").each {
+            segmentUnitParameters += cotInput.createBooleanParameter('', it)
+        }
+        def segmentUnitInputs = input(
 
-        id: 'userInput', message: 'Segment Level Units', parameters: segmentUnitParameters
-    )
-    def segmentUnits=[]
-    segmentUnitInputs?.findAll{ it.value }?.each {
-        segmentUnits += [ it.key.toString() ]
+            id: 'userInput', message: 'Segment Level Units', parameters: segmentUnitParameters
+        )
+        def segmentUnits=[]
+        segmentUnitInputs?.findAll{ it.value }?.each {
+            segmentUnits += [ it.key.toString() ]
+        }
+        env.SEGMENT_UNITS = segmentUnits.join(",")
     }
-    env.SEGMENT_UNITS = segmentUnits.join(",")
 
     // Solution Units
-    def solutionUnitParameters = []
-    productProperties["SOLUTION_UNITS"].split(",").each {
-        solutionUnitParameters += cotInput.createBooleanParameter('', it)
-    }
-    def solutionUnitInputs = input(
+    if env.LEVELS_LIST.contains('solution') {
+        def solutionUnitParameters = []
+        productProperties["SOLUTION_UNITS"].split(",").each {
+            solutionUnitParameters += cotInput.createBooleanParameter('', it)
+        }
+        def solutionUnitInputs = input(
 
-        id: 'userInput', message: 'Solution Level Units', parameters: solutionUnitParameters
-    )
-    def solutionUnits=[]
-    solutionUnitInputs?.findAll{ it.value }?.each {
-        solutionUnits += [ it.key.toString() ]
+            id: 'userInput', message: 'Solution Level Units', parameters: solutionUnitParameters
+        )
+        def solutionUnits=[]
+        solutionUnitInputs?.findAll{ it.value }?.each {
+            solutionUnits += [ it.key.toString() ]
+        }
+        env.SOLUTION_UNITS = solutionUnits.join(",")
     }
-    env.SOLUTION_UNITS = solutionUnits.join(",")
 
     // Application Units
-    def applicationUnitParameters = []
-    productProperties["APPLICATION_UNITS"].split(",").each {
-        applicationUnitParameters += cotInput.createBooleanParameter( '', it)
-    }
-    def appliationUnitInputs = input(
+    if env.LEVELS_LIST.contains('application') {
+        def applicationUnitParameters = []
+        productProperties["APPLICATION_UNITS"].split(",").each {
+            applicationUnitParameters += cotInput.createBooleanParameter( '', it)
+        }
+        def appliationUnitInputs = input(
 
-        id: 'userInput', message: 'Application Level Units', parameters: applicationUnitParameters
-    )
-    def applicationUnits=[]
-    appliationUnitInputs?.findAll{ it.value }?.each {
-        applicationUnits += [ it.key.toString() ]
+            id: 'userInput', message: 'Application Level Units', parameters: applicationUnitParameters
+        )
+        def applicationUnits=[]
+        appliationUnitInputs?.findAll{ it.value }?.each {
+            applicationUnits += [ it.key.toString() ]
+        }
+        env.APPLICATION_UNITS = applicationUnits.join(",")
     }
-    env.APPLICATION_UNITS = applicationUnits.join(",")
-    
+
 }
