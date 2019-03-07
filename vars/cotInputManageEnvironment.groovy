@@ -48,7 +48,7 @@ def call( String propertiesFile ) {
         segmentUnitInputs?.findAll{ it.value }?.each {
             segmentUnits += [ it.key.toString() ]
         }
-        env.SEGMENT_UNITS = segmentUnits.join(",")
+        env.SEGMENT_UNITS_LIST = segmentUnits.join(",")
     }
 
     // Solution Units
@@ -65,7 +65,7 @@ def call( String propertiesFile ) {
         solutionUnitInputs?.findAll{ it.value }?.each {
             solutionUnits += [ it.key.toString() ]
         }
-        env.SOLUTION_UNITS = solutionUnits.join(",")
+        env.SOLUTION_UNITS_LIST = solutionUnits.join(",")
     }
 
     // Application Units
@@ -82,7 +82,7 @@ def call( String propertiesFile ) {
         appliationUnitInputs?.findAll{ it.value }?.each {
             applicationUnits += [ it.key.toString() ]
         }
-        env.APPLICATION_UNITS = applicationUnits.join(",")
+        env.APPLICATION_UNITS_LIST = applicationUnits.join(",")
     }
 
 }
