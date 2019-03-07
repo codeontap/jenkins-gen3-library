@@ -21,7 +21,7 @@ def call( String propertiesFile, String[]applicationDeploymentUnits ) {
      // Deployment Units
     def applicationUnitParameters = []
     productProperties["APPLICATION_UNITS"].split(",").each {
-        applicationUnitParameters += createBooleanParameter( '', it)
+        applicationUnitParameters += cotInput.createBooleanParameter( '', it)
     }
     def appliationUnitInputs = input(
 

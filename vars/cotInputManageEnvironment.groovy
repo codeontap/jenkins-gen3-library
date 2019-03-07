@@ -22,7 +22,7 @@ def call( String propertiesFile ) {
     // Levels
     def levelParameters = []
     productProperties["LEVELS_LIST"].split(",").each { 
-        levelParameters += createBooleanParameter('', it )
+        levelParameters += cotInput.createBooleanParameter('', it )
     }
     def levelInputs = input(
 
@@ -37,7 +37,7 @@ def call( String propertiesFile ) {
     // Segment units
     def segmentUnitParameters = []
     productProperties["SEGMENT_UNITS"].split(",").each {
-        segmentUnitParameters += createBooleanParameter('', it)
+        segmentUnitParameters += cotInput.createBooleanParameter('', it)
     }
     def segmentUnitInputs = input(
 
@@ -52,7 +52,7 @@ def call( String propertiesFile ) {
     // Solution Units
     def solutionUnitParameters = []
     productProperties["SOLUTION_UNITS"].split(",").each {
-        solutionUnitParameters += createBooleanParameter('', it)
+        solutionUnitParameters += cotInput.createBooleanParameter('', it)
     }
     def solutionUnitInputs = input(
 
@@ -67,7 +67,7 @@ def call( String propertiesFile ) {
     // Application Units
     def applicationUnitParameters = []
     productProperties["APPLICATION_UNITS"].split(",").each {
-        applicationUnitParameters += createBooleanParameter( '', it)
+        applicationUnitParameters += cotInput.createBooleanParameter( '', it)
     }
     def appliationUnitInputs = input(
 
