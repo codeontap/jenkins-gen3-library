@@ -35,7 +35,7 @@ def call( String propertiesFile ) {
     env.LEVELS_LIST = levels.join(",")
     
     // Segment units
-    if env.LEVELS_LIST.contains('segment') {  
+    if ( env.LEVELS_LIST.contains('segment') ) {  
         def segmentUnitParameters = []
         productProperties["SEGMENT_UNITS"].split(",").each {
             segmentUnitParameters += cotInput.createBooleanParameter('', it)
@@ -52,7 +52,7 @@ def call( String propertiesFile ) {
     }
 
     // Solution Units
-    if env.LEVELS_LIST.contains('solution') {
+    if ( env.LEVELS_LIST.contains('solution') ) {
         def solutionUnitParameters = []
         productProperties["SOLUTION_UNITS"].split(",").each {
             solutionUnitParameters += cotInput.createBooleanParameter('', it)
@@ -69,7 +69,7 @@ def call( String propertiesFile ) {
     }
 
     // Application Units
-    if env.LEVELS_LIST.contains('application') {
+    if ( env.LEVELS_LIST.contains('application') ) {
         def applicationUnitParameters = []
         productProperties["APPLICATION_UNITS"].split(",").each {
             applicationUnitParameters += cotInput.createBooleanParameter( '', it)
