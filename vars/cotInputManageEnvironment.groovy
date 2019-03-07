@@ -1,11 +1,5 @@
 #!/usr/bin/env groovy
 
-@NonCPS
-def createBooleanParameter(String desc, String value){
-
-   return [$class: 'BooleanParameterDefinition', defaultValue: true, description: desc, name: value]
-}
-
 def call( String propertiesFile ) {
 
     def defaultProperties = [DEPLOYMENT_MODE_LIST: 'update,stop', LEVELS_LIST: 'segment,solution,application', GENERATION_DEBUG: '', AUTOMATION_DEBUG: '' ]

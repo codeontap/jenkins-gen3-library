@@ -1,5 +1,7 @@
 #!/usr/bin/env groovy
 
-def info(message) {
-    echo "INFO: ${message}"
+@NonCPS
+def createBooleanParameter(String desc, String value){
+
+   return [$class: 'BooleanParameterDefinition', defaultValue: true, description: desc, name: value]
 }
