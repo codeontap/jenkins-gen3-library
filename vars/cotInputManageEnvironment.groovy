@@ -28,7 +28,7 @@ def call( String propertiesFile ) {
     // Levels
     def levelParameters = []
     productProperties["LEVELS_LIST"].split(",").each { 
-        levelParameters += createBooleanParameter('Level', it )
+        levelParameters += createBooleanParameter('', it )
     }
     def levelInputs = input(
 
