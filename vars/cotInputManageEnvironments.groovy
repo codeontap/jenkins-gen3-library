@@ -6,7 +6,7 @@ def createBooleanParameter(String desc, String value){
    return [$class: 'BooleanParameterDefinition', defaultValue: true, description: desc, name: value]
 }
 
-def call( String propertiesFile, String agentLabel ) {
+def call( String propertiesFile ) {
 
     def defaultProperties = [DEPLOYMENT_MODE_LIST: 'update,stop', LEVELS_LIST: 'segment,solution,application', GENERATION_DEBUG: '', AUTOMATION_DEBUG: '' ]
     productProperties = readProperties interpolate: true, file: propertiesFile, defaults: defaultProperties;
@@ -18,6 +18,12 @@ def call( String propertiesFile, String agentLabel ) {
             string(name: 'COMMENT', defaultValue: '', description: 'Added to the git commit message' ),
             booleanParam( name: 'TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT', defaultValue: false, description: 'Set this to force redeployment where only the runid value has changed. Mainly used where data is in S3.')
         ]
+
+    env.DEPLOYMENT_MODE = basicParameters["DEPLOYMENT_MODE"]
+    env.ENVIRONMENT = basicParameters["ENVIRONMENT"]
+    env.SEGMENT = basicParameters["SEGMENT"]
+    env.COMMENT = basicParameters["COMMENT"]
+    env.TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT = basicParameters["TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT"]
 
     // Levels
     def levelParameters = []
@@ -32,7 +38,7 @@ def call( String propertiesFile, String agentLabel ) {
     levelInputs?.findAll{ it.value }?.each {
         levels += [ it.key.toString() ]
     }
-    levels = levels.join(",")
+    env.LEVELS_LIST = levels.join(",")
     
     // Segment units
     def segmentUnitParameters = []
@@ -47,7 +53,7 @@ def call( String propertiesFile, String agentLabel ) {
     segmentUnitInputs?.findAll{ it.value }?.each {
         segmentUnits += [ it.key.toString() ]
     }
-    segmentUnits = segmentUnits.join(",")
+    env.SEGMENT_UNITS = segmentUnits.join(",")
 
     // Solution Units
     def solutionUnitParameters = []
@@ -62,7 +68,7 @@ def call( String propertiesFile, String agentLabel ) {
     solutionUnitInputs?.findAll{ it.value }?.each {
         solutionUnits += [ it.key.toString() ]
     }
-    solutionUnits = solutionUnits.join(",")
+    env.SOLUTION_UNITS = solutionUnits.join(",")
 
     // Application Units
     def applicationUnitParameters = []
@@ -77,18 +83,6 @@ def call( String propertiesFile, String agentLabel ) {
     appliationUnitInputs?.findAll{ it.value }?.each {
         applicationUnits += [ it.key.toString() ]
     }
-    applicationUnits = applicationUnits.join(",")
+    env.APPLICATION_UNITS = applicationUnits.join(",")
     
-    // Call manage environment
-    cotTaskManageEnvironment(
-            propertiesFile: propertiesFile,
-            deploymentMode: basicParameters["DEPLOYMENT_MODE"],
-            environment: basicParameters["ENVIRONMENT"],
-            segment: basicParameters["SEGMENT"],
-            comment: basicParameters["COMMENT"],
-            treatRunIdAsSignificant: basicParameters["TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT"],
-            levelsList: levels,
-            segmentUnits: segmentUnits,
-            solutionUnits: solutionUnits,
-            applicationUnits: applicationUnits)
 }
