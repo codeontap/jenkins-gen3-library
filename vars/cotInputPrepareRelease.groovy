@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def call( String propertiesFile, String[]applicationDeploymentUnits ) {
+def call( String propertiesFile, String[] applicationDeploymentUnits ) {
 
     def defaultProperties = [GENERATION_DEBUG: '', AUTOMATION_DEBUG: '' ]
     productProperties = readProperties interpolate: true, file: propertiesFile, defaults: defaultProperties;
