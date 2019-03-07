@@ -1,14 +1,14 @@
 #!/usr/bin/env groovy
 
-def call( def String propertiesFile ) {
+def call( ) {
 
-    def defaultProperties = [DEPLOYMENT_MODE_LIST: 'update,stop', LEVELS_LIST: 'segment,solution,application', GENERATION_DEBUG: '', AUTOMATION_DEBUG: '' ]
-    productProperties = readProperties interpolate: true, file: propertiesFile, defaults: defaultProperties;
-
+    def deploymentModes = env.DEPLOYMENT_MODE_LIST ?: 'update,stop' 
+    def levelsList = 'segment,solution,application'
+    
     def basicParameters = input message: 'Please Provide Parameters', ok: 'Start', parameters: [
-            choice(name: 'DEPLOYMENT_MODE', choices: "${productProperties["DEPLOYMENT_MODE_LIST"].split(",").join("\n")}", description: 'Desired way in which deploy should occur' ),
-            choice(name: 'ENVIRONMENT', choices: "${productProperties["ENVIRONMENT_LIST"].split(",").join("\n")}", description: 'Environment to manage'),
-            choice(name: 'SEGMENT', choices: "${productProperties["SEGMENT_LIST"].split(",").join("\n")}", description: 'Segment to manage' ),
+            choice(name: 'DEPLOYMENT_MODE', choices: "${deploymentModes.split(",").join("\n")}", description: 'Desired way in which deploy should occur' ),
+            choice(name: 'ENVIRONMENT', choices: "${env.ENVIRONMENT_LIST.split(",").join("\n")}", description: 'Environment to manage'),
+            choice(name: 'SEGMENT', choices: "${env.SEGMENT_LIST.split(",").join("\n")}", description: 'Segment to manage' ),
             string(name: 'COMMENT', defaultValue: '', description: 'Added to the git commit message' ),
             booleanParam( name: 'TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT', defaultValue: false, description: 'Set this to force redeployment where only the runid value has changed. Mainly used where data is in S3.')
         ]
@@ -21,7 +21,7 @@ def call( def String propertiesFile ) {
 
     // Levels
     def levelParameters = []
-    productProperties["LEVELS_LIST"].split(",").each { 
+    levelsList.split(",").each { 
         levelParameters += cotInput.createBooleanParameter('', it )
     }
     def levelInputs = input(
@@ -37,7 +37,7 @@ def call( def String propertiesFile ) {
     // Segment units
     if ( env.LEVELS_LIST.contains('segment') ) {  
         def segmentUnitParameters = []
-        productProperties["SEGMENT_UNITS"].split(",").each {
+        env.SEGMENT_UNITS.split(",").each {
             segmentUnitParameters += cotInput.createBooleanParameter('', it)
         }
         def segmentUnitInputs = input(
@@ -54,7 +54,7 @@ def call( def String propertiesFile ) {
     // Solution Units
     if ( env.LEVELS_LIST.contains('solution') ) {
         def solutionUnitParameters = []
-        productProperties["SOLUTION_UNITS"].split(",").each {
+       env.SOLUTION_UNITS.split(",").each {
             solutionUnitParameters += cotInput.createBooleanParameter('', it)
         }
         def solutionUnitInputs = input(
@@ -71,7 +71,7 @@ def call( def String propertiesFile ) {
     // Application Units
     if ( env.LEVELS_LIST.contains('application') ) {
         def applicationUnitParameters = []
-        productProperties["APPLICATION_UNITS"].split(",").each {
+        env.APPLICATION_UNITS.split(",").each {
             applicationUnitParameters += cotInput.createBooleanParameter( '', it)
         }
         def appliationUnitInputs = input(

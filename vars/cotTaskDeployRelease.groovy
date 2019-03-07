@@ -1,10 +1,10 @@
 #!/usr/bin/env groovy
 
-def call( String propertiesFile ) {
+def call( ) {
 
     def environmentVariables = []
-    def productProperties = readProperties interpolate: true, file: propertiesFile;
-    environmentVariables += productProperties.collect {/$it.key=$it.value/ }
+    def siteProperties = readProperties interpolate: true, file: cot.siteProperties();
+    environmentVariables += siteProperties.collect {/$it.key=$it.value/ }
 
     withEnv ( environmentVariables ) {
         sh '''#!/bin/bash

@@ -1,12 +1,11 @@
 #!/usr/bin/env groovy
 
-def call( def String propertiesFile ) {
+def call( ) {
 
-    def defaultProperties = [GENERATION_DEBUG: '', AUTOMATION_DEBUG: '', MODE: 'update,stopstart,stop' ]
-    productProperties = readProperties interpolate: true, file: propertiesFile, defaults: defaultProperties;
+    def deploymentMode = env.DEPLOYMENT_MODE ?: 'update,stopstart,stop'
 
     def basicParameters = input message: 'Please Provide Parameters', ok: 'Start', parameters: [
-            choice(name: 'MODE', choices: "${productProperties["MODE"].split(",").join("\n")}", description: '''
+            choice(name: 'MODE', choices: "${deploymentMode.split(",").join("\n")}", description: '''
                 Desired way in which deploy should occur. 
                     "update" will attempt a hot cutover from the running deployment to the desired deployment.
                     "stopstart" will first stop the running deployment before starting the desired deployment.
@@ -15,12 +14,11 @@ def call( def String propertiesFile ) {
             string( name: 'RELEASE_IDENTIFIER', defaultValue: '', description: 'Identifier for the release to be deployed. \n The release identifier is allocated during release preparation.' )
         ]
 
-    env.DEPLOYMENT_UNITS = basicParameters["DEPLOYMENT_UNITS"]
     env.RELEASE_IDENTIFIER = basicParameters["RELEASE_IDENTIFIER"]    
 
      // Deployment Units
     def applicationUnitParameters = []
-    productProperties["APPLICATION_UNITS"].split(",").each {
+    env.APPLICATION_UNITS.split(",").each {
         applicationUnitParameters += cotInput.createBooleanParameter( '', it)
     }
     def appliationUnitInputs = input(
