@@ -8,8 +8,8 @@ def call( String propertiesFile ) {
 
     withEnv ( environmentVariables ) {
         sh '''#!/bin/bash
-            trap \'exit ${RESULT:-1}\' EXIT SIGHUP SIGINT SIGTERM
-            ${AUTOMATION_BASE_DIR}/setContext.sh
+            trap 'exit ${RESULT:-1}' EXIT SIGHUP SIGINT SIGTERM
+            ${AUTOMATION_BASE_DIR}/setContext.sh -r selective
             RESULT=$?
         '''
     }
