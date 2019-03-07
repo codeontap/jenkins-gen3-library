@@ -2,7 +2,9 @@
 
 def call( String propertiesFile ) {
 
-    def environmentVariables = [ GIT_COMMIT="" ]
+    env.GIT_COMMIT = ''
+    
+    def environmentVariables = [ ]
     def productProperties = readProperties interpolate: true, file: propertiesFile;
     environmentVariables += productProperties.collect {/$it.key=$it.value/ }
 
