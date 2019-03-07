@@ -1,9 +1,6 @@
 #!/usr/bin/env groovy
 
-def call( Map params = [:] ) {
-
-    def propertiesFile = params.get(propertiesFile, "")
-    def applicationDeploymentUnits = params.get(deploymentUnits, [ "" ] )
+def call(def String propertiesFile, def List<String> applicationDeploymentUnits) {
     
     def defaultProperties = [GENERATION_DEBUG: '', AUTOMATION_DEBUG: '' ]
     productProperties = readProperties interpolate: true, file: propertiesFile, defaults: defaultProperties;
