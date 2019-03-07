@@ -2,10 +2,12 @@
 
 def call( ) {
 
+    skipDefaultCheckout()
+
     def environmentVariables = []
     def siteProperties = readProperties interpolate: true, file: cot.siteProperties();
     environmentVariables += siteProperties.collect {/$it.key=$it.value/ }
-    
+
     // Override builtin variables
     environmentVariables += [ 'GIT_COMMIT=' ]
 

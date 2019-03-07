@@ -1,6 +1,8 @@
 #!/usr/bin/env groovy
 
 def call( String propertiesFile ) {
+
+    skipDefaultCheckout()
     
     def environmentVariables = []
     def siteProperties = readProperties interpolate: true, file: cot.siteProperties();
