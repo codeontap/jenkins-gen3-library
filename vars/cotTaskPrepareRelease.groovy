@@ -6,10 +6,13 @@ def call( String propertiesFile ) {
     def productProperties = readProperties interpolate: true, file: propertiesFile;
     environmentVariables += productProperties.collect {/$it.key=$it.value/ }
 
+    sh 'env'
+    sh 'unset GIT_COMMIT'
+    sh 'env'
+
     withEnv ( environmentVariables ) {
         sh '''#!/bin/bash
             trap 'exit ${RESULT:-1}' EXIT SIGHUP SIGINT SIGTERM
-            export CODE_COMMIT=''
             ${AUTOMATION_BASE_DIR}/setContext.sh -r selective
             RESULT=$?
         '''
