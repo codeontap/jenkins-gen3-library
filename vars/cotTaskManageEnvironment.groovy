@@ -4,7 +4,7 @@ def call( Map params = [:] ) {
 
     skipDefaultCheckout(true)
 
-    echo "${params}"
+    echo "${params.get('environment', '') }"
 
     //levelsList          = (params.get('levelsList', [])).join(',')
     //segmentUnits        = (params.get('segmentUnits', [])).join(',')
@@ -13,15 +13,15 @@ def call( Map params = [:] ) {
 
     def environmentVariables = []
 
-    environmentVariables['ENVIRONMENT']                             = params.get('environment', '')
-    environmentVariables['SEGMENT']                                 = params.get('segment', '')
-    environmentVariables['DEPLOYMENT_MODE']                         = params.get('deploymentMode', '') 
-    environmentVariables['COMMENT']                                 = params.get('comment', '')
+    //environmentVariables['ENVIRONMENT']                             = params.get('environment', '')
+    //environmentVariables['SEGMENT']                                 = params.get('segment', '')
+    //environmentVariables['DEPLOYMENT_MODE']                         = params.get('deploymentMode', '') 
+    //environmentVariables['COMMENT']                                 = params.get('comment', '')
     //environmentVariables['LEVELS_LIST']                             = levelsList
     //environmentVariables['SEGMENT_UNITS_LIST']                      = segmentUnits
     //environmentVariables['SOLUTION_UNITS_LIST']                     = solutionUnits
     //environmentVariables['APPLICATION_UNITS_LIST']                  = applicationUnits
-    environmentVariables['TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT'] = params.get('runIdSignificant', '')
+    //environmentVariables['TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT'] = params.get('runIdSignificant', '')
 
     def siteProperties = readProperties interpolate: true, file: cot.siteProperties();
     environmentVariables += siteProperties.collect {/$it.key=$it.value/ }
