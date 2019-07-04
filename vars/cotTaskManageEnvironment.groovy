@@ -22,9 +22,10 @@ def call( Map params = [:] ) {
     environmentVariables += [ "SOLUTION_UNITS=${solutionUnits}" ]
     environmentVariables += [ "APPLICATION_UNITS=${applicationUnits}" ]
 
-    echo "${environmentVariables}"
-
     def siteProperties = readProperties interpolate: true, file: cot.siteProperties();
+
+    echo "file ${cot.siteProperties} - Content: ${siteProperties}"
+
     environmentVariables += siteProperties.collect {/$it.key=$it.value/ }
 
     withEnv ( environmentVariables ) {
