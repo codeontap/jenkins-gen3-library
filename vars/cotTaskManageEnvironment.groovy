@@ -18,9 +18,9 @@ def call( Map params = [:] ) {
     environmentVariables += [ "TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT=${params.get('runIdSignificant', '')}" ]
 
     environmentVariables += [ "LEVELS_LIST=${levelsList}" ]
-    environmentVariables += [ "LEVELS_LIST=${segmentUnits}" ]
-    environmentVariables += [ "LEVELS_LIST=${solutionUnits}" ]
-    environmentVariables += [ "LEVELS_LIST=${applicationUnits}" ]
+    environmentVariables += [ "SEGMENT_UNITS=${segmentUnits}" ]
+    environmentVariables += [ "SOLUTION_UNITS=${solutionUnits}" ]
+    environmentVariables += [ "APPLICATION_UNITS=${applicationUnits}" ]
 
     echo "${environmentVariables}"
 
