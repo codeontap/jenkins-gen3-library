@@ -17,7 +17,6 @@ def call(
     segmentUnits        = segmentUnits.join(',')
     solutionUnits       = solutionUnits.join(',')
     applicationUnits    = applicationUnits.join(',')
-    runIdSignificant    = runIdSignificant as String
 
     def environmentVariables = []
 
