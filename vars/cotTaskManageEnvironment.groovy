@@ -22,10 +22,11 @@ def call( Map params = [:] ) {
     environmentVariables += [ "SOLUTION_UNITS=${solutionUnits}" ]
     environmentVariables += [ "APPLICATION_UNITS=${applicationUnits}" ]
 
-    def siteProperties = readProperties interpolate: true, file: env.PRODUCT_PROPERTIES;
 
-    echo "file ${ cot.siteProperties() } - Content: ${siteProperties}"
+    def propertiesFile = env.PRODUCT_PROPERTIES ?: '/var/opt/codeontap/site.properties'
+    def siteProperties = readProperties interpolate: true, file: propertiesFile;
 
+    echo "file ${propertiesFile} - content ${siteProperties}"
     environmentVariables += siteProperties.collect {/$it.key=$it.value/ }
 
     withEnv ( environmentVariables ) {
