@@ -29,7 +29,7 @@ def call(
     environmentVariables['SEGMENT_UNITS_LIST'] = segmentUnits ?: env.SEGMENT_UNITS
     environmentVariables['SOLUTION_UNITS_LIST'] =  solutionUnits ?: env.SOLUTION_UNITS
     environmentVariables['APPLICATION_UNITS_LIST'] = applicationUnits ?: env.APPLICATION_UNITS
-    environmentVariables['TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT'] = runIdSignificant ? env.TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT
+    environmentVariables['TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT'] = runIdSignificant ?: env.TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT
 
     def siteProperties = readProperties interpolate: true, file: cot.siteProperties();
     environmentVariables += siteProperties.collect {/$it.key=$it.value/ }
