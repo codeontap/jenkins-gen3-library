@@ -24,7 +24,7 @@ def call( Map params = [:] ) {
 
     def siteProperties = readProperties interpolate: true, file: cot.siteProperties();
 
-    echo "file ${cot.siteProperties} - Content: ${siteProperties}"
+    echo "file ${cot.siteProperties() } - Content: ${siteProperties}"
 
     environmentVariables += siteProperties.collect {/$it.key=$it.value/ }
 
