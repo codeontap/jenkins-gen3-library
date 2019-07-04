@@ -11,15 +11,15 @@ def call( Map params = [:] ) {
 
     def environmentVariables = []
 
-    environmentVariables['ENVIRONMENT']                             = params.get('environment', env.ENVIRONMENT) 
-    environmentVariables['SEGMENT']                                 = params.get('segment', env.SEGMENT)
-    environmentVariables['deploymentMode']                          = params.get('deploymentMode', env.DEPLOYMENT_MODE)
-    environmentVariables['comment']                                 = params.get('comment', env.COMMENT)
-    environmentVariables['LEVELS_LIST']                             = params.get('levelsList', env.LEVELS_LIST)
-    environmentVariables['SEGMENT_UNITS_LIST']                      = params.get('segmentUnits', env.SEGMENT_UNITS)
-    environmentVariables['SOLUTION_UNITS_LIST']                     = params.get('solutionUnits', env.SOLUTION_UNITS)
-    environmentVariables['APPLICATION_UNITS_LIST']                  = params.get('applicationUnits', env.APPLICATION_UNITS)
-    environmentVariables['TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT'] = params.get('runIdSignificant', env.TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT)
+    environmentVariables['ENVIRONMENT']                             = params.get('environment', '')
+    environmentVariables['SEGMENT']                                 = params.get('segment', '')
+    environmentVariables['deploymentMode']                          = params.get('deploymentMode', '') 
+    environmentVariables['comment']                                 = params.get('comment', '')
+    environmentVariables['LEVELS_LIST']                             = params.get('levelsList', '')
+    environmentVariables['SEGMENT_UNITS_LIST']                      = params.get('segmentUnits', '')
+    environmentVariables['SOLUTION_UNITS_LIST']                     = params.get('solutionUnits', '')
+    environmentVariables['APPLICATION_UNITS_LIST']                  = params.get('applicationUnits', '') 
+    environmentVariables['TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT'] = params.get('runIdSignificant', '')
 
     def siteProperties = readProperties interpolate: true, file: cot.siteProperties();
     environmentVariables += siteProperties.collect {/$it.key=$it.value/ }
