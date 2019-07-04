@@ -4,7 +4,7 @@ def call( Map params = [:] ) {
 
     skipDefaultCheckout(true)
 
-    echo "${params.get('environment', '') }"
+    echo "${params.get('flibberdy', '') }"
 
     //levelsList          = (params.get('levelsList', [])).join(',')
     //segmentUnits        = (params.get('segmentUnits', [])).join(',')
