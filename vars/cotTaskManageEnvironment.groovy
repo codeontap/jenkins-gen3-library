@@ -4,21 +4,21 @@ def call( Map params = [:] ) {
 
     skipDefaultCheckout(true)
 
-    levelsList          = params.get('levelsList', []).join(',')
-    segmentUnits        = params.get('segmentUnits', []).join(',')
-    solutionUnits       = params.get('solutionUnits', []).join(',')
-    applicationUnits    = params.get('applicationUnits', []).join(',')
+    levelsList          = (params.get('levelsList', [])).join(',')
+    segmentUnits        = (params.get('segmentUnits', [])).join(',')
+    solutionUnits       = (params.get('solutionUnits', [])).join(',')
+    applicationUnits    = (params.get('applicationUnits', [])).join(',')
 
     def environmentVariables = []
 
     environmentVariables['ENVIRONMENT']                             = params.get('environment', '')
     environmentVariables['SEGMENT']                                 = params.get('segment', '')
-    environmentVariables['deploymentMode']                          = params.get('deploymentMode', '') 
-    environmentVariables['comment']                                 = params.get('comment', '')
-    environmentVariables['LEVELS_LIST']                             = params.get('levelsList', '')
-    environmentVariables['SEGMENT_UNITS_LIST']                      = params.get('segmentUnits', '')
-    environmentVariables['SOLUTION_UNITS_LIST']                     = params.get('solutionUnits', '')
-    environmentVariables['APPLICATION_UNITS_LIST']                  = params.get('applicationUnits', '') 
+    environmentVariables['DEPLOYMENT_MODE']                         = params.get('deploymentMode', '') 
+    environmentVariables['COMMENT']                                 = params.get('comment', '')
+    environmentVariables['LEVELS_LIST']                             = levelsList
+    environmentVariables['SEGMENT_UNITS_LIST']                      = segmentUnits
+    environmentVariables['SOLUTION_UNITS_LIST']                     = solutionUnits
+    environmentVariables['APPLICATION_UNITS_LIST']                  = applicationUnits
     environmentVariables['TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT'] = params.get('runIdSignificant', '')
 
     def siteProperties = readProperties interpolate: true, file: cot.siteProperties();
