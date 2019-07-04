@@ -21,6 +21,8 @@ def call( Map params = [:] ) {
     //environmentVariables['APPLICATION_UNITS_LIST']                  = applicationUnits
     //environmentVariables['TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT'] = params.get('runIdSignificant', '')
 
+    echo "${environmentVariables}"
+
     def siteProperties = readProperties interpolate: true, file: cot.siteProperties();
     environmentVariables += siteProperties.collect {/$it.key=$it.value/ }
 
