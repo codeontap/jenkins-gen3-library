@@ -4,10 +4,10 @@ def call( Map params = [:] ) {
 
     skipDefaultCheckout(true)
 
-    pipelineParams.levelsList          = params.get(levelsList, []).join(',')
-    pipelineParams.segmentUnits        = params.get(segmentUnits, []).join(',')
-    solutionUnits                      = params.get(solutionUnits, []).join(',')
-    applicationUnits                   = params.get(applicationUnits, []).join(',')
+    levelsList          = params.get(levelsList, []).join(',')
+    segmentUnits        = params.get(segmentUnits, []).join(',')
+    solutionUnits       = params.get(solutionUnits, []).join(',')
+    applicationUnits    = params.get(applicationUnits, []).join(',')
 
     def environmentVariables = []
 
