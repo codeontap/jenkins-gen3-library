@@ -20,9 +20,9 @@ def call(
     environmentVariables['deploymentMode'] = deploymentMode ?: env.DEPLOYMENT_MODE
     environmentVariables['comment'] = deploymentMode ?: env.comment
     environmentVariables['levelsList'] = levelsList ?: env.LEVELS_LIST
-    environmentVariables['segmentUnits'] = segmentUnits?join(',') ?: env.SEGMENT_UNITS
-    environmentVariables['solutionUnits'] = solutionUnits?join(',') ?: env.SOLUTION_UNITS
-    environmentVariables['applicationUnits'] = applicationUnits?join(',') ?: env.APPLICATION_UNITS
+    environmentVariables['segmentUnits'] = ( segmentUnits?join(',') )  ?: env.SEGMENT_UNITS
+    environmentVariables['solutionUnits'] = ( solutionUnits?join(',') ) ?: env.SOLUTION_UNITS
+    environmentVariables['applicationUnits'] = ( applicationUnits?join(',') ) ?: env.APPLICATION_UNITS
 
     def siteProperties = readProperties interpolate: true, file: cot.siteProperties();
     environmentVariables += siteProperties.collect {/$it.key=$it.value/ }
