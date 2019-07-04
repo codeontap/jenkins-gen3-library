@@ -4,8 +4,6 @@ def call( Map params = [:] ) {
 
     skipDefaultCheckout(true)
 
-    echo "${params.get('flibberdy', '') }"
-
     //levelsList          = (params.get('levelsList', [])).join(',')
     //segmentUnits        = (params.get('segmentUnits', [])).join(',')
     //solutionUnits       = (params.get('solutionUnits', [])).join(',')
@@ -13,7 +11,7 @@ def call( Map params = [:] ) {
 
     def environmentVariables = []
 
-    //environmentVariables['ENVIRONMENT']                             = params.get('environment', '')
+    environmentVariables += [ "ENVIRONMENT=${params.get('environment', '')}" ]
     //environmentVariables['SEGMENT']                                 = params.get('segment', '')
     //environmentVariables['DEPLOYMENT_MODE']                         = params.get('deploymentMode', '') 
     //environmentVariables['COMMENT']                                 = params.get('comment', '')
