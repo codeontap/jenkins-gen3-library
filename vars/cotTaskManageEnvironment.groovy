@@ -1,34 +1,25 @@
 #!/usr/bin/env groovy
 
-def call( 
-        String      environment, 
-        String      segment, 
-        String      deploymentMode,
-        String      comment ,  
-        String[]    levelsList,
-        String[]    segmentUnits,
-        String[]    solutionUnits,
-        String[]    applicationUnits,
-        Boolean     runIdSignificant = false ) {
+def call( Map params = [:] ) {
 
     skipDefaultCheckout(true)
 
-    levelsList          = levelsList.join(',')
-    segmentUnits        = segmentUnits.join(',')
-    solutionUnits       = solutionUnits.join(',')
-    applicationUnits    = applicationUnits.join(',')
+    pipelineParams.levelsList          = params.get(levelsList, []).join(',')
+    pipelineParams.segmentUnits        = params.get(segmentUnits, []).join(',')
+    solutionUnits                      = params.get(solutionUnits, []).join(',')
+    applicationUnits                   = params.get(applicationUnits, []).join(',')
 
     def environmentVariables = []
 
-    environmentVariables['ENVIRONMENT'] = environment ?: env.ENVIRONMENT
-    environmentVariables['SEGMENT'] = segment ?: env.SEGMENT
-    environmentVariables['deploymentMode'] = deploymentMode ?: env.DEPLOYMENT_MODE
-    environmentVariables['comment'] = deploymentMode ?: env.COMMENT
-    environmentVariables['LEVELS_LIST'] = levelsList ?: env.LEVELS_LIST
-    environmentVariables['SEGMENT_UNITS_LIST'] = segmentUnits ?: env.SEGMENT_UNITS
-    environmentVariables['SOLUTION_UNITS_LIST'] =  solutionUnits ?: env.SOLUTION_UNITS
-    environmentVariables['APPLICATION_UNITS_LIST'] = applicationUnits ?: env.APPLICATION_UNITS
-    environmentVariables['TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT'] = runIdSignificant ?: env.TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT
+    environmentVariables['ENVIRONMENT']                             = params.get(environment, env.ENVIRONMENT) 
+    environmentVariables['SEGMENT']                                 = params.get(segment, env.SEGMENT)
+    environmentVariables['deploymentMode']                          = params.get(deploymentMode,env.DEPLOYMENT_MODE)
+    environmentVariables['comment']                                 = params.get(comment, env.COMMENT)
+    environmentVariables['LEVELS_LIST']                             = params.get(levelsList, env.LEVELS_LIST)
+    environmentVariables['SEGMENT_UNITS_LIST']                      = params.get(segmentUnits, env.SEGMENT_UNITS)
+    environmentVariables['SOLUTION_UNITS_LIST']                     = params.get(solutionUnits, env.SOLUTION_UNITS)
+    environmentVariables['APPLICATION_UNITS_LIST']                  = params.get(applicationUnits, env.APPLICATION_UNITS)
+    environmentVariables['TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT'] = params.get(runIdSignificant, env.TREAT_RUN_ID_DIFFERENCES_AS_SIGNIFICANT)
 
     def siteProperties = readProperties interpolate: true, file: cot.siteProperties();
     environmentVariables += siteProperties.collect {/$it.key=$it.value/ }
