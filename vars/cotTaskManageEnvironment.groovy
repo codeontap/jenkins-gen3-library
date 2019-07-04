@@ -13,19 +13,18 @@ def call(
 
     skipDefaultCheckout(true)
 
+    levelsList          = levelsList.join(',')
+    segmentUnits        = segmentUnits.join(',')
+    solutionUnits       = solutionUnits.join(',')
+    applicationUnits    = applicationUnits.join(',')
+    runIdSignificant    = runIdSignificant as String
+
     def environmentVariables = []
 
     environmentVariables['ENVIRONMENT'] = environment ?: env.ENVIRONMENT
     environmentVariables['SEGMENT'] = segment ?: env.SEGMENT
     environmentVariables['deploymentMode'] = deploymentMode ?: env.DEPLOYMENT_MODE
-    environmentVariables['comment'] = deploymentMode ?: env.comment
-
-    levelsList = levelsList?join(',')
-    segmentUnits = segmentUnits?join(',')
-    solutionUnits = solutionUnits?join(',')
-    applicationUnits = applicationUnits?join(',')
-    runIdSignificant = runIdSignificant as String
-
+    environmentVariables['comment'] = deploymentMode ?: env.COMMENT
     environmentVariables['LEVELS_LIST'] = levelsList ?: env.LEVELS_LIST
     environmentVariables['SEGMENT_UNITS_LIST'] = segmentUnits ?: env.SEGMENT_UNITS
     environmentVariables['SOLUTION_UNITS_LIST'] =  solutionUnits ?: env.SOLUTION_UNITS
