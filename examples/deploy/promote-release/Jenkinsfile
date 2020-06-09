@@ -1,0 +1,127 @@
+#!groovy
+
+// Promote Release Pipeline
+// Provide the release identifier from an environment that has passed testing
+// The build configuration from this environment will be loaded into the environment this pipelne is run for
+
+pipeline {
+    agent {
+        label '<hamlet agent label>'
+    }
+
+    options {
+        timestamps ()
+        buildDiscarder(
+            logRotator(
+                daysToKeepStr: '14'
+            )
+        )
+        durabilityHint('PERFORMANCE_OPTIMIZED')
+        parallelsAlwaysFailFast()
+        checkoutToSubdirectory '.hamlet/product/'
+    }
+
+    parameters {
+        string(
+            name: 'RELEASE_IDENTIFIER',
+            defaultValue: '',
+            description: 'Identifier for the release. If not provided, the current build number will be used'
+        )
+    }
+
+    environment {
+        properties_file = '.hamlet/product/<product properties file>'
+        slack_channel = '<slack channel>'
+
+        ENVIRONMENT = '<ENVIRONMENT>'
+        SEGMENT = '<SEGMENT>'
+        RELEASE_INDETIFIER = "${params["RELEASE_INDETIFIER"]}"
+    }
+
+    stages{
+        stage('Setup') {
+            steps {
+                // Load in Properties files
+                script {
+                    def productProperties = readProperties interpolate: true, file: "${env.properties_file}";
+                    productProperties.each{ k, v -> env["${k}"] ="${v}" }
+
+                }
+
+            }
+        }
+
+        stage('Prepare') {
+            steps {
+                sh '''#!/bin/bash
+                    ${AUTOMATION_BASE_DIR}/setContext.sh -r promotion
+                '''
+
+                script {
+                    def contextProperties = readProperties interpolate: true, file: "${WORKSPACE}/context.properties";
+                    contextProperties.each{ k, v -> env["${k}"] ="${v}" }
+                }
+
+                sh '''#!/bin/bash
+                    ${AUTOMATION_DIR}/promoteRelease.sh
+                '''
+
+                script {
+                    def contextProperties = readProperties interpolate: true, file: "${WORKSPACE}/context.properties";
+                    contextProperties.each{ k, v -> env["${k}"] ="${v}" }
+                }
+
+
+                sh '''#!/bin/bash
+                    ${AUTOMATION_DIR}/constructTree.sh
+                '''
+
+                script {
+                    def contextProperties = readProperties interpolate: true, file: "${WORKSPACE}/context.properties";
+                    contextProperties.each{ k, v -> env["${k}"] ="${v}" }
+                }
+
+                sh '''#!/bin/bash
+                    ${AUTOMATION_DIR}/confirmBuilds.sh
+                '''
+
+                script {
+                    def contextProperties = readProperties interpolate: true, file: "${WORKSPACE}/context.properties";
+                    contextProperties.each{ k, v -> env["${k}"] ="${v}" }
+                }
+
+                sh '''#!/bin/bash
+                    ${AUTOMATION_DIR}/updateBuildReferences.sh
+                '''
+
+                script {
+                    def contextProperties = readProperties interpolate: true, file: "${WORKSPACE}/context.properties";
+                    contextProperties.each{ k, v -> env["${k}"] ="${v}" }
+                }
+
+                script {
+                    currentBuild.description = "Release Id: ${env.RELEASE_IDENTIFIER}"
+                }
+
+            }
+        }
+    }
+
+    post {
+        success {
+            slackSend (
+                message: "Promote Completed - ${BUILD_DISPLAY_NAME} (<${BUILD_URL}|Open>)\n Environment: ${env.ENVIRONMENT} - Segment: ${env.SEGMENT}",
+                channel: "${env["slack_channel"]}",
+                color: "#50C878"
+            )
+        }
+
+        failure {
+            slackSend (
+                message: "Promote Failed - ${BUILD_DISPLAY_NAME} (<${BUILD_URL}|Open>)\n Environment: ${env.ENVIRONMENT} - Segment: ${env.SEGMENT}",
+                channel: "${env["slack_channel"]}",
+                color: "#B22222"
+            )
+        }
+    }
+}

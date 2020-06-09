@@ -1,0 +1,84 @@
+#!groovy
+
+// Docker Pull Image to ECR registry Utility
+// Set dockerImage full tags in dockerImages array - Will be split into the appropriate parameters
+// This is based on a single Account Id for the iamge pull
+//    - A paramter or input step would be required for multiple accounts
+// For full control over the image pull - make the following Env settings parameters
+//   DOCKER_REPO - the local name of the image
+//   DOCKER_TAG - the local image tag
+//   REMOTE_DOCKER_REPO - the remote docker image name
+//   REMOTE_DOCKER_TAG - the remote docker image tag
+// The current configuration will use the same values for local and remote
+
+def dockerImages = [
+    '<Docker repo>:<docker tag>'
+]
+
+pipeline {
+    agent {
+        label '<hamlet agent label>'
+    }
+    options {
+        timestamps ()
+        buildDiscarder(
+            logRotator(
+                daysToKeepStr: '14'
+            )
+        )
+        durabilityHint('PERFORMANCE_OPTIMIZED')
+        parallelsAlwaysFailFast()
+        checkoutToSubdirectory '.hamlet/product/'
+    }
+
+    parameters {
+
+        choice name: 'DOCKER_IMAGE', choices: dockerImages, description: 'The docker image to pull'
+
+    }
+
+    environment {
+        properties_file = '.hamlet/product/<product properties location>'
+
+        ACCOUNT = '<Account Id>'
+        // Required to align with current AWS ecs image
+        DOCKER_API_VERSION = '1.39'
+    }
+
+
+    stages{
+
+        stage('Setup') {
+            steps {
+                script {
+                    env["DOCKER_REPO"] = params["DOCKER_IMAGE"].split(':')[0]
+                    env["DOCKER_TAG"] = params["DOCKER_IMAGE"].split(':')[1]
+                    env["REMOTE_DOCKER_REPO"] = params["DOCKER_IMAGE"].split(':')[0]
+                    env["REMOTE_DOCKER_TAG"] = params["DOCKER_IMAGE"].split(':')[1]
+                }
+            }
+        }
+
+        stage('Pull Image') {
+            steps {
+                script {
+                    def contextProperties = readProperties interpolate: true, file: "${env.properties_file}";
+                    contextProperties.each{ k, v -> env["${k}"] ="${v}" }
+                }
+
+                sh '''#!/bin/bash
+                    ${AUTOMATION_BASE_DIR}/setContext.sh
+                '''
+
+                script {
+                    def contextProperties = readProperties interpolate: true, file: "${WORKSPACE}/context.properties";
+                    contextProperties.each{ k, v -> env["${k}"] ="${v}" }
+                }
+
+                sh '''#!/bin/bash
+                    ${AUTOMATION_DIR}/manageDocker.sh -p -u dockerhub
+                '''
+            }
+        }
+    }
+}
