@@ -1,0 +1,142 @@
+#!groovy
+
+// Prepare Release Example pipeline
+// Provide your Deployment units list as an array in the release units var
+// This allows for the setting the format and setting which units require build ref updates
+// Creates the templates required for a release and updates build references based on values specified
+
+
+def releaseUnits = [
+    '<Your unit list as an array>!'
+]
+
+pipeline {
+    agent {
+        label '<hamlet agent label>'
+    }
+
+    options {
+        timestamps ()
+        buildDiscarder(
+            logRotator(
+                daysToKeepStr: '14'
+            )
+        )
+        durabilityHint('PERFORMANCE_OPTIMIZED')
+        parallelsAlwaysFailFast()
+        checkoutToSubdirectory '.hamlet/product/'
+    }
+
+    parameters {
+        text(
+            name: 'DEPLOYMENT_UNITS',
+            defaultValue: "${ releaseUnits.join("\n") }",
+            description: 'Units to be updated as part of the release preparation. For those units where code references are to be updated, append the detail after the affected unit',
+        )
+
+
+        string(
+            name: 'RELEASE_IDENTIFIER',
+            defaultValue: '',
+            description: 'Identifier for the release. If not provided, the current build number will be used'
+        )
+    }
+
+    environment {
+        properties_file = '.hamlet/product/<product properties pipeline>'
+        slack_channel = '<slack channel>'
+
+        ENVIRONMENT = '<ENVIRONMENT>'
+        SEGMENT = '<SEGMENT>'
+        DEPLOYMENT_UNITS = "${params["DEPLOYMENT_UNITS"]}"
+        RELEASE_INDETIFIER = "${params["RELEASE_INDETIFIER"]}"
+    }
+
+    stages{
+        stage('Setup') {
+            steps {
+                // Load in Properties files
+                script {
+                    def productProperties = readProperties interpolate: true, file: "${env.properties_file}";
+                    productProperties.each{ k, v -> env["${k}"] ="${v}" }
+
+                }
+
+            }
+        }
+
+        stage('Prepare') {
+            steps {
+                sh '''#!/bin/bash
+                    ${AUTOMATION_BASE_DIR}/setContext.sh -r selective
+                '''
+
+                script {
+                    def contextProperties = readProperties interpolate: true, file: "${WORKSPACE}/context.properties";
+                    contextProperties.each{ k, v -> env["${k}"] ="${v}" }
+                }
+
+                sh '''#!/bin/bash
+                    ${AUTOMATION_DIR}/constructTree.sh
+                '''
+
+                script {
+                    def contextProperties = readProperties interpolate: true, file: "${WORKSPACE}/context.properties";
+                    contextProperties.each{ k, v -> env["${k}"] ="${v}" }
+                }
+
+
+                sh '''#!/bin/bash
+                    ${AUTOMATION_DIR}/confirmBuilds.sh
+                '''
+
+                script {
+                    def contextProperties = readProperties interpolate: true, file: "${WORKSPACE}/context.properties";
+                    contextProperties.each{ k, v -> env["${k}"] ="${v}" }
+                }
+
+                sh '''#!/bin/bash
+                    ${AUTOMATION_DIR}/prepareReleaseSetup.sh
+                '''
+
+                script {
+                    def contextProperties = readProperties interpolate: true, file: "${WORKSPACE}/context.properties";
+                    contextProperties.each{ k, v -> env["${k}"] ="${v}" }
+                }
+
+                sh '''#!/bin/bash
+                    ${AUTOMATION_DIR}/prepareRelease.sh
+                '''
+
+                script {
+                    def contextProperties = readProperties interpolate: true, file: "${WORKSPACE}/context.properties";
+                    contextProperties.each{ k, v -> env["${k}"] ="${v}" }
+                }
+
+                script {
+                    currentBuild.description = "Release Id: ${env.RELEASE_IDENTIFIER}"
+                }
+
+            }
+        }
+    }
+
+
+    post {
+        success {
+            slackSend (
+                message: "Prepare Completed - ${BUILD_DISPLAY_NAME} (<${BUILD_URL}|Open>)\n Environment: ${env.ENVIRONMENT} - Segment: ${env.SEGMENT} \n DeploymentUnits: ${params.DEPLOYMENT_UNITS}",
+                channel: "${env["slack_channel"]}",
+                color: "#50C878"
+            )
+        }
+
+        failure {
+            slackSend (
+                message: "Prepare Failed - ${BUILD_DISPLAY_NAME} (<${BUILD_URL}|Open>)\n Environment: ${env.ENVIRONMENT} - Segment: ${env.SEGMENT} \n DeploymentUnits: ${params.DEPLOYMENT_UNITS}",
+                channel: "${env["slack_channel"]}",
+                color: "#B22222"
+            )
+        }
+    }
+}
