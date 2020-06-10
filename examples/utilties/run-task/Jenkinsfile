@@ -1,6 +1,7 @@
 #!groovy
 
-// Environment Management Pipeline
+// Run Task ECS Task Example
+// - Runs django migrate for the nominated task instance in the nominated environment
 
 pipeline {
     agent {
@@ -99,9 +100,9 @@ pipeline {
 
                 sh '''#!/bin/bash
                 ${GENERATION_DIR}/runTask.sh \
-                    -t "application" -i "app-ecs" \
-                    -w "www-task" -x "${TASK_INSTANCE}" -y "" -c "www" \
-                    -e "APP_TASK_LIST" -v "${MANAGE_PY_TASK}"
+                    -t "<ECS Host Tier Name>" -i "<ECS Host Component Id>" \
+                    -w "<ECS Task Component Id>" -x "${TASK_INSTANCE}" -y "" -c "<ECS Task Container Id>" \
+                    -e "<Environment Var to ovveride>" -v "${MANAGE_PY_TASK}"
                 '''
             }
         }
