@@ -120,7 +120,7 @@ pipeline {
             slackSend (
                 message: "Promote Failed - ${BUILD_DISPLAY_NAME} (<${BUILD_URL}|Open>)\n Environment: ${env.ENVIRONMENT} - Segment: ${env.SEGMENT}",
                 channel: "${env["slack_channel"]}",
-                color: "#B22222"
+                color: "#D20F2A"
             )
         }
     }

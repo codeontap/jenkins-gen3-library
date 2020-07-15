@@ -122,7 +122,7 @@ pipeline {
             slackSend (
                 message: "Accept Release Failed - ${BUILD_DISPLAY_NAME} (<${BUILD_URL}|Open>)\n Environment: ${env.ENVIRONMENT} - Segment: ${env.SEGMENT} - Release Id: ${env.RELEASE_IDENTIFIER}",
                 channel: "${env["slack_channel"]}",
-                color: "#B22222"
+                color: "#D20F2A"
             )
         }
     }

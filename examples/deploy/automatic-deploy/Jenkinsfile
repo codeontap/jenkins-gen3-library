@@ -168,7 +168,7 @@ pipeline {
                     slackSend (
                         message: "Deploy Failed - ${BUILD_DISPLAY_NAME} (<${BUILD_URL}|Open>)\n Environment: ${env.ENVIRONMENT} - Segment: ${env.SEGMENT} \n DeploymentUnits: ${params.DEPLOYMENT_UNITS} - Commit: ${params.GIT_COMMIT}",
                         channel: "${env["slack_channel"]}",
-                        color: "#B22222"
+                        color: "#D20F2A"
                     )
                 }
             }
