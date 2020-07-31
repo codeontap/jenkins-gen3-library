@@ -1,0 +1,185 @@
+#!groovy
+
+// Environment Management Pipeline
+
+pipeline {
+    agent {
+        label '<osx agent label>'
+    }
+    options {
+        timestamps ()
+        buildDiscarder(
+            logRotator(
+                daysToKeepStr: '30'
+            )
+        )
+        durabilityHint('PERFORMANCE_OPTIMIZED')
+        parallelsAlwaysFailFast()
+        skipDefaultCheckout()
+    }
+
+    parameters {
+        choice(
+            name: 'DEPLOYMENT_UNIT',
+            choices: ['integration', 'preproduction', 'production'],
+            description: 'Environment to run the publish in'
+        )
+
+        choice(
+            name: 'DEPLOYMENT_UNIT',
+            choices: ['myapp-v1'],
+            description: 'Unit to be published'
+        )
+
+        booleanParam(
+            name: 'FORCE_BINARY_BUILD',
+            defaultValue: false,
+            description: 'Force the build of binary images'
+        )
+
+        booleanParam(
+            name: 'SUBMIT_BINARY',
+            defaultValue: false,
+            description: 'Submit binary to app store for testing'
+        )
+
+        booleanParam(
+            name: 'DISABLE_OTA',
+            defaultValue: false,
+            description: 'Disable the deployment of an OTA to the CDN. Useful when doing library updates in binary images'
+        )
+
+    }
+
+    environment {
+        slack_channel = ''
+
+        // Add the standard hamlet properties here
+        // You might need to add some of the account level settings if you aren't uses a properties file in your CMDB
+
+        // Set the build process to use for the build
+        // Can either be
+            // fastlane - for expo ejected or bare worflows
+            // turtle - for expo client based builds
+        BINARY_BUILD_PROCESS = 'fastlane'
+
+        // Can be used to lock Turtle to a specific version in order to ensure a specific Expo SDK is available
+        // Each Turtle version only includes a specific collection of SDK builders
+        // - See https://github.com/expo/turtle/tree/master/shellTarballs for a given tag version to see whcih SDK versions are supported
+        // If you are keeping up to date with expo releases remove this and leave it to the default
+        TURTLE_VERSION = '0.16.2'
+
+    }
+
+    stages {
+        stage('Setup Context') {
+            steps {
+                script {
+                    def contextProperties = readProperties interpolate: true, file: "${env.properties_file}";
+                    contextProperties.each{ k, v -> env["${k}"] ="${v}" }
+                }
+
+                sh '''#!/bin/bash
+                    ${AUTOMATION_BASE_DIR}/setContext.sh
+                '''
+
+                script {
+                    def contextProperties = readProperties interpolate: true, file: "${WORKSPACE}/context.properties";
+                    contextProperties.each{ k, v -> env["${k}"] ="${v}" }
+                }
+
+                sh '''#!/bin/bash
+                    ${AUTOMATION_DIR}/constructTree.sh
+                '''
+
+                script {
+                    def contextProperties = readProperties interpolate: true, file: "${WORKSPACE}/context.properties";
+                    contextProperties.each{ k, v -> env["${k}"] ="${v}" }
+                }
+            }
+        }
+
+        stage('Run Publish Expo') {
+            environment {
+                DEPLOYMENT_UNIT = "${params["DEPLOYMENT_UNIT"]}"
+                FORCE_BINARY_BUILD = "${params["FORCE_BINARY_BUILD"]}"
+                SUBMIT_BINARY = "${params["SUBMIT_BINARY"]}"
+                DISABLE_OTA = "${params["DISABLE_OTA"]}"
+            }
+
+            steps {
+                script {
+                    currentBuild.description = "Environment: ${env["ENVIRONMENT"]} - Deployment unit: ${env["DEPLOYMENT_UNIT"]}"
+                }
+
+                sh '''#!/bin/bash
+                ${GENERATION_DIR}/runExpoAppPublish.sh -u "${DEPLOYMENT_UNIT}"
+                '''
+
+                script {
+                    def contextProperties = readProperties interpolate: true, file: "${WORKSPACE}/context.properties";
+                    contextProperties.each{ k, v -> env["${k}"] ="${v}" }
+                }
+            }
+
+            post {
+                success {
+                    publishHTML(
+                        [
+                            allowMissing: false,
+                            alwaysLinkToLastBuild: true,
+                            keepAll: true,
+                            reportDir: 'reports/',
+                            reportFiles: 'build-report.html',
+                            reportName: 'Expo Build Report',
+                            reportTitles: ''
+                        ]
+                    )
+                }
+            }
+        }
+
+        // Triggers a sentry source maps relase job using - https://github.com/hamlet-io/executor-bash/blob/0378f22409edd7c88e907dd7852531b10e8cb05b/cli/runSentryRelease.sh
+        // This should only be run in the first environment the app is pubslished in. Source maps will stay the same in each environment
+        stage('Sentry release') {
+            when {
+                equals expected: '<environment>', actual: "${params.ENVIRONMENT}"
+            }
+
+            steps {
+
+                script {
+                    def chainProperties = readProperties interpolate: true, file: "${WORKSPACE}/chain.properties";
+                    chainProperties.each{ k, v -> env["${k}"] ="${v}" }
+                }
+                build job: '../utilities/sentry-release', wait: true, parameters: [
+                    string(name: 'SENTRY_SOURCE_MAP_S3_URL', value: "${env["SENTRY_SOURCE_MAP_S3_URL"]}"),
+                    string(name: 'SENTRY_URL_PREFIX', value: "${env["SENTRY_URL_PREFIX"]}"),
+                    string(name: 'DEPLOYMENT_UNIT', value: "${env["DEPLOYMENT_UNIT"]}")
+                ]
+            }
+        }
+    }
+
+    post {
+        success {
+            slackSend (
+                message: "*Success* | <${BUILD_URL}|${JOB_NAME}> \n ${DETAIL_MESSAGE}",
+                channel: "${env["slack_channel"]}",
+                color: "#50C878"
+            )
+        }
+
+        failure {
+            slackSend (
+                message: "*Failure* | <${BUILD_URL}|${JOB_NAME}> \n ${DETAIL_MESSAGE}",
+                channel: "${env["slack_channel"]}",
+                color: "#D20F2A"
+            )
+        }
+        cleanup {
+            cleanWs()
+        }
+    }
+
+}
