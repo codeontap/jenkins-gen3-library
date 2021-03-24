@@ -2,7 +2,7 @@
 
 // Environment Management Pipeline
 // Loads properties file from CMDB repository
-// Asks for input after loading of properties file from CMDB - No Parameters intially
+// Asks for input after loading of properties file from CMDB - No Parameters initially
 
 
 pipeline {
