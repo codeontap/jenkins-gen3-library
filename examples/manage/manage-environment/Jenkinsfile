@@ -27,7 +27,7 @@ pipeline {
 
         PRODUCT_INFRASTRUCTURE_REFERENCE = 'master'
         PRODUCT_CONFIG_REFERENCE = 'master'
-
+        GITHUB_CREDENTIALS = credentials('<github-credentials-id>')
         SEGMENT = 'default'
     }
 
@@ -147,6 +147,7 @@ pipeline {
         stage('Manage Env') {
             steps {
                 sh '''#!/bin/bash
+                    ${GENERATION_DIR}/setup.sh
                     ${AUTOMATION_DIR}/manageEnvironment.sh
                 '''
 
